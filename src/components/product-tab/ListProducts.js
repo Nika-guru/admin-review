@@ -9,7 +9,7 @@ import _ from 'lodash';
 const { Title } = Typography
 
 const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSearch }) => {
-  const PAGE_SIZE = 100
+  const PAGE_SIZE = 50
   const navigate = useNavigate()
 
   const handleDeleteProduct = async(e, record) => {
@@ -107,12 +107,12 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
         render: (_, record) => (<span>
             {record?.type === 'token' 
             ? (
-                record?.address != null
+                record?.address !== null && record?.address !== ''
                 ? 
-                <>
+                (<>
                     <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
                     <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
-                </>
+                </>)
                 : ''
                 )
             : ''
@@ -123,17 +123,10 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
         title: 'Sub Category',
         dataIndex: "subcategory",
         render: (_, record) => <>
-            {record?.subcategory?.split(',')?.map((item) => (<div>
+            {record?.subcategory != null && record?.subcategory?.split(',')?.join(';')?.split(';')?.map((item) => (<div>
                 {item}
             </div>))}
         </>
-    },
-    {
-        title: 'Show',
-        dataIndex: "isshow",
-        render: (_, record) => (<span>
-            {record?.isshow ? 'TRUE' : 'FALSE'}
-        </span>)
     },
     {
         title: 'From By',

@@ -70,7 +70,7 @@ const AddProduct = () => {
   const [openReason, setOpenReason] = useState(false)
   const [categories, setCategories] = useState([])
   const [subCategories, setSubCategories] = useState([])
-  const [defaultCategory, setDefaultCategory] = useState(1)
+  const [defaultCategory, setDefaultCategory] = useState(`35daf6ff-6273-4358-bce0-39bf6648996f`) //default uuid
   const [params, setParams] = useState([])
 
 

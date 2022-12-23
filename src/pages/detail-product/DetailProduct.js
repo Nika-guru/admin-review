@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox } from 'antd'
+import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox, Divider } from 'antd'
 import { MinusCircleOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import { del, get, patch } from '../../api/products'
 import { regexFloatNumber } from '../../utils/regex'
@@ -42,7 +42,6 @@ const DetailProduct = () => {
         })
       }
 
-    console.log(`productInfo===`, productInfo)
 
     const onFinish = async(values) => {
         const regex = /^[0-9]*$/
@@ -284,7 +283,7 @@ const DetailProduct = () => {
         { name: 'symbol', value: productInfo[0]?.symbol },
         { name: 'name', value: productInfo[0]?.name },
         { name: 'category', value: productInfo[0]?.category !== null ? productInfo[0]?.category : '' },
-        { name: 'subCategory', value: (productInfo[0]?.subcategory !== '') ?productInfo[0]?.subcategory?.split(',') : [] },
+        { name: 'subCategory', value: (productInfo[0]?.subcategory !== '') ?productInfo[0]?.subcategory?.split(',')?.join(';')?.split(';') : [] },
         // { name: 'newCategory', value: '' },
         // { name: 'newSubCategory', value: [] },
         { name: 'image', value: productInfo[0]?.image },
@@ -387,7 +386,11 @@ const DetailProduct = () => {
                                 title={<span className='form-add-card-title'>Project Info</span>}
                                 bordered={true}
                                 extra={
-                                    <><Button
+                                <>
+                                {/* <Space>
+
+                                </Space> */}
+                                <Button
                                     type='primary'
                                     style={{ right: '5%' }}
                                     onClick={() => setIsEditProduct(true)}
@@ -403,7 +406,7 @@ const DetailProduct = () => {
                                 >
                                     Delete Product
                                 </Button>
-                                    </>
+                                </>
                                 }
                             >
                                 

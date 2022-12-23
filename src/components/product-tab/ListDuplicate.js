@@ -43,18 +43,6 @@ const ListDuplicate = ({ loading, total, setPage, page, dataSearch, handleClickI
             </div>
         </span>
     },
-    // {
-    //     title: "Address",
-    //     dataIndex: "address",
-    //     render: (_, record) => (<span>
-    //       {record?.address && (
-    //         <>
-    //           {record?.address}
-    //           <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
-    //         </>
-    //       )}
-    //     </span>)
-    // },
     {
         title: "Number",
         dataIndex: "count",

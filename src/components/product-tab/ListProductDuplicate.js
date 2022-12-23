@@ -162,12 +162,15 @@ const ListProductDuplicate = () => {
         render: (_, record) => (<span>
             {record?.type === 'token' 
              ? (
-                record?.address != null
-                ? <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
+                record?.address !== null && record?.address !== ''
+                ? 
+                <>
+                    <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
+                    <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
+                </>
                 : ''
                 )
              : ''}
-            <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
         </span>)
     },
     {
@@ -181,7 +184,7 @@ const ListProductDuplicate = () => {
         title: 'Sub Category',
         dataIndex: "subcategory",
         render: (_, record) => <>
-            {record?.subcategory?.split(',')?.map((item) => (<div>
+            {record?.subcategory != null && record?.subcategory?.split(',')?.join(';')?.split(';')?.map((item) => (<div>
                 {item}
             </div>))}
         </>
