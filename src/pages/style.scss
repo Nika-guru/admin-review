@@ -1,0 +1,34 @@
+.table-responsive{
+    width: 100%;
+    & .ant-table{
+        border-radius: 1.2rem;
+    }
+    & .ant-table table{
+        border-radius: 1.2rem;
+    }
+    & .ant-table-tbody > tr.ant-table-placeholder:hover > td:first-child{
+        border-bottom-left-radius: 1.2rem;
+    }
+    & .ant-table-tbody > tr.ant-table-placeholder:hover > td:last-child{
+        border-bottom-right-radius: 1.2rem;
+    }
+}
+.card{
+    &-content{
+        & button{
+            margin-left: 0.5rem;
+        }
+       
+    }
+}
+.ant-card.tablespace .ant-card-body{
+    padding: 0 0 2rem 0 !important;
+}
+.review-button-search{
+    width: 100%;
+    text-align: center;
+    margin-top: 1.5rem;
+    & button{
+        margin-left: 0.5rem;
+    }
+}
