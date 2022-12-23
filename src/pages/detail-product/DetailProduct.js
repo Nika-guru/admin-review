@@ -42,9 +42,8 @@ const DetailProduct = () => {
         })
       }
 
-    // console.log(`productInfo===`, productInfo)
+    console.log(`productInfo===`, productInfo)
 
-    //TODO: productInfo xem isEditProduct
     const onFinish = async(values) => {
         const regex = /^[0-9]*$/
         const {
@@ -1174,7 +1173,7 @@ const DetailProduct = () => {
                                     </>
                                 ) : (
                                     <span className='form-add-item-content'>
-                                        {productInfo[0]?.detail?.sourceCode !== null && Object.keys(productInfo[0]?.detail?.sourceCode).map((key) => {
+                                        {productInfo[0]?.detail?.sourceCode != null && Object.keys(productInfo[0]?.detail?.sourceCode).map((key) => {
                                             return (
                                             <>
                                             <div style={{ display: 'flex' }}>
@@ -1252,7 +1251,7 @@ const DetailProduct = () => {
                                         )}
                                     </Form.List>
                                 ) : (<span className='form-add-item-content'>
-                                        {productInfo[0]?.detail?.decimals !== null && Object.keys(productInfo[0]?.detail?.decimals)?.map((key) => {
+                                        {productInfo[0]?.detail?.decimals != null && Object.keys(productInfo[0]?.detail?.decimals)?.map((key) => {
                                             return (<div style={{ marginBottom: '1rem' }}>
                                                 <div>Chain Name: <span style={{ marginLeft: '0.5rem' }}>{key}</span></div>
                                                 <div>Contract: 
@@ -1365,7 +1364,7 @@ const DetailProduct = () => {
                                         </Form.List>
                                     </>
                                 ) : (<span>
-                                   {productInfo[0]?.detail?.website !== null && Object.keys(productInfo[0]?.detail?.website).map((key) => {
+                                   {productInfo[0]?.detail?.website != null && Object.keys(productInfo[0]?.detail?.website).map((key) => {
                                             return (
                                             <>
                                             <div style={{ display: 'flex' }}>

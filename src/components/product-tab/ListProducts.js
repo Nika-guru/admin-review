@@ -105,12 +105,18 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
         title: "Address",
         dataIndex: "address",
         render: (_, record) => (<span>
-            {record?.address && (
+            {record?.type === 'token' 
+            ? (
+                record?.address != null
+                ? 
                 <>
                     <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
                     <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
                 </>
-            )}
+                : ''
+                )
+            : ''
+        }
         </span>)
     },
     {
