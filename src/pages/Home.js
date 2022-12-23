@@ -187,7 +187,6 @@ const Home = () => {
       ...paramsSearch,
       page
     }
-    setPage(page)
     if (!isSearch) {
       getAll()
     }else{
