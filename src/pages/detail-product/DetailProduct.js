@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox, Divider } from 'antd'
+import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox, Popconfirm, Switch } from 'antd'
 import { MinusCircleOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import { del, get, patch } from '../../api/products'
 import { regexFloatNumber } from '../../utils/regex'
+import {  useNavigate } from 'react-router-dom'
 import { useParams, useLocation } from 'react-router-dom'
 import _ from 'lodash'
 import { getCookie, STORAGEKEY } from '../../utils/storage'
@@ -11,6 +12,7 @@ const { Option } = Select
 const { TextArea } = Input
 
 const DetailProduct = () => {
+  const navigate = useNavigate()
     const userInfo = getCookie(STORAGEKEY.USER_INFO)
     const { productId } = useParams()
     const TYPE_COIN = 'coin'
@@ -35,11 +37,23 @@ const DetailProduct = () => {
 
     const handleDeleteProduct = async(e, record) => {
         e.stopPropagation()
-        await del(`reviews/product/productId=${record?.id}`)
-        message.success({
-            content: `Delete ${record?.name ? record?.name : record?.id} successfully`,
-            duration: 3
-        })
+        try{
+            document.getElementById(`btnDelete`).setAttribute('disabled', 'disabled')
+            document.getElementById(`btnEdit`).setAttribute('disabled', 'disabled')
+            await del(`reviews/product/productId=${record?.id}`)
+            message.success({
+                message: 'Success',
+                description: `Delete ${record?.name ? record?.name : record?.id} successfully`,
+            })
+            navigate('../../dashboard')
+        }catch(e){
+            message.warn({
+                message: 'Warning',
+                description: `Delete ${record?.name ? record?.name : record?.id} failed, try again later`,
+            })
+            document.getElementById(`btnDelete`).removeAttribute('disabled')
+            document.getElementById(`btnEdit`).removeAttribute('disabled')
+        }
       }
 
 
@@ -387,25 +401,43 @@ const DetailProduct = () => {
                                 bordered={true}
                                 extra={
                                 <>
-                                {/* <Space>
-
-                                </Space> */}
-                                <Button
+                                <>
+                                <Space direction="horizontal">
+                                      <Switch checkedChildren="Scam" unCheckedChildren="Not scam" defaultChecked />
+                                      <Switch checkedChildren="Warning" unCheckedChildren="Not warning" defaultChecked />
+                                  </Space>
+                                <br />
+                                <br />
+                            
+                                  <Space direction="horizontal">
+                                  <Button
                                     type='primary'
                                     style={{ right: '5%' }}
+                                    id='btnEdit'
                                     onClick={() => setIsEditProduct(true)}
                                 >
                                     Edit Product
                                 </Button>
                                 
+                                <Popconfirm 
+                                      title="Are you sure delete this produt?" 
+                                      okText="Yes"
+                                      cancelText="No"
+                                      onConfirm={(e) => {
+                                        handleDeleteProduct(e, productInfo[0])
+                                      }}
+                                      >
                                 <Button
                                     type='danger'
-                                    onClick={(e) => {
-                                        handleDeleteProduct(e, productInfo[0])
-                                    }}
+                                    id='btnDelete'
                                 >
                                     Delete Product
                                 </Button>
+                                </Popconfirm>
+
+                              </Space>
+                                      
+                        </>
                                 </>
                                 }
                             >
@@ -1386,35 +1418,6 @@ const DetailProduct = () => {
                                         })}
                                 </span>)}
                             </Card>
-
-
-                            {/* {isEditProduct ? '' : (
-                                <Card
-                                    title={<span className='form-add-card-title'>Conclusion</span>}
-                                    bordered={true}
-                                >
-                                    <div className='form-add-item'>
-                                        {productInfo[1]?.evaluates?.map((item) => (
-                                            <>
-                                                <div>
-                                                    <div>Is Scam: {item?.isScam ? 'TRUE' : 'FALSE'}</div>
-                                                    {item?.isScam && (
-                                                        <>
-                                                            <div>Reason: {item?.reason}</div>
-                                                            <div>Source:
-                                                                <a href={item?.sources} target='_blank' rel="noreferrer">
-                                                                    {item?.sources}
-                                                                </a>
-                                                            </div>
-                                                            <div>Verify: {item?.isVerify ? 'TRUE' : 'FALSE'}</div>
-                                                        </>
-                                                    )}
-                                                </div>
-                                            </>
-                                        ))}
-                                    </div>
-                                </Card>
-                            )} */}
                         </Space>
 
                         {isEditProduct && (

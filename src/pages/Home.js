@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { Card, Col, Row, Typography } from "antd";
-import { Layout, Button, Input, Form, Select, Checkbox } from 'antd'
+import { Layout, Button, Input, Form, Select, Checkbox, Switch, Space, Popconfirm} from 'antd'
+
 import { get } from '../api/products';
 
 import { useNavigate } from 'react-router-dom'

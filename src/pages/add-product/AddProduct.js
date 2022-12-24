@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Form, Input, Radio, Button, Space, Select, Checkbox, Card } from 'antd'
+import { Row, Col, Form, Input, Radio, Button, Space, Select, Checkbox, Card, notification } from 'antd'
 import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import { get, post } from '../../api/products'
 import { regexFloatNumber } from '../../utils/regex'
@@ -184,9 +184,26 @@ const AddProduct = () => {
             },
         }
     }
-    console.log(body)
-    await post('reviews/product/add', body)
-    navigate('../../dashboard')
+
+    try{
+        document.getElementById(`btnAdd`).setAttribute('disabled', 'disabled')
+        console.log(body)
+        await post('reviews/product/add', body)
+        notification.success({
+            message: 'Success',
+            description: `Add success`
+        })
+        navigate('../../dashboard')
+    }catch(e){
+        console.error(e)
+
+        notification.warn({
+            message: 'Warning',
+            description: `Add fail, try again`
+        })
+        document.getElementById(`btnAdd`).removeAttribute('disabled')
+    }
+
   }
 
   const handleChangeCategory = (value) => {
@@ -1177,7 +1194,13 @@ const AddProduct = () => {
             </Space>
 
             <Form.Item>
-                <Button type='primary' htmlType='submit' style={{ marginTop: '20px' }}>Add Project</Button>
+                <Button 
+                    id="btnAdd"
+                    type='primary' 
+                    htmlType='submit' 
+                    style={{ marginTop: '20px' }}>
+                        Add Project
+                </Button>
             </Form.Item>
         </Form>
     </div>

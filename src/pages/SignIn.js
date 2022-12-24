@@ -23,8 +23,8 @@ const SignIn = () => {
       }
     }catch(e){
       notification.warn({
-        message: 'Warm',
-        description: `Sai mật khẩu hoặc email`
+        message: 'Warning',
+        description: `Wrong email or password`
       })
       document.getElementById(`btnSignin`).removeAttribute('disabled')
     }

@@ -138,7 +138,7 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
     {
         title: "Action",
         render: (_, record) => (<div className='product-icon-action'>
-            <EditOutlined onClick={(e) => handleEditProduct(e, record)}/>
+            {/* <EditOutlined onClick={(e) => handleEditProduct(e, record)}/> */}
             <DeleteOutlined onClick={(e) => handleDeleteProduct(e, record)}/>
         </div>)
     },
