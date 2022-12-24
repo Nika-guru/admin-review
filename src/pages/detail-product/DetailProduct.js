@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox, Popconfirm, Switch } from 'antd'
+import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, message, Checkbox, Popconfirm, Switch, notification } from 'antd'
 import { MinusCircleOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import { del, get, patch } from '../../api/products'
 import { regexFloatNumber } from '../../utils/regex'
@@ -36,18 +36,18 @@ const DetailProduct = () => {
     const [defaultValueForm, setDefaultValueForm] = useState()
 
     const handleDeleteProduct = async(e, record) => {
-        e.stopPropagation()
+        // e.stopPropagation()
         try{
             document.getElementById(`btnDelete`).setAttribute('disabled', 'disabled')
             document.getElementById(`btnEdit`).setAttribute('disabled', 'disabled')
             await del(`reviews/product/productId=${record?.id}`)
-            message.success({
+            notification.success({
                 message: 'Success',
-                description: `Delete ${record?.name ? record?.name : record?.id} successfully`,
+                description: `Delete successfully`,
             })
-            navigate('../../dashboard')
+            navigate('/dashboard')
         }catch(e){
-            message.warn({
+            notification.warn({
                 message: 'Warning',
                 description: `Delete ${record?.name ? record?.name : record?.id} failed, try again later`,
             })
@@ -589,7 +589,7 @@ const DetailProduct = () => {
                                                         (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                                     }
                                                     options={subCategories?.map((item) => ({
-                                                        value: `${item?.id}`,
+                                                        value: `${item?.name}`,
                                                         label: item?.name,
                                                     }))}
                                                 />

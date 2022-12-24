@@ -7,6 +7,8 @@ import './styles/product.scss'
 import './styles/duplicate.scss'
 import { useNavigate } from 'react-router-dom';
 import { ChainNameContext } from '../components/layout/Main';
+import { Link } from "react-router-dom";
+
 
 const { Content } = Layout
 
@@ -62,6 +64,11 @@ const Duplicate = () => {
   }, [contextChainName, page])
 
   const handleClickItem = async(record) => {
+    const domain = window.location.href
+    console.log(domain)
+    var newWindow = window.open(domain + `/` + contextChainName?.chainName, `_blank`)
+    // const state = useState({ ...record, chainName: contextChainName?.chainName } )
+    return
     navigate(`${contextChainName?.chainName}`, { state: { record: { ...record, chainName: contextChainName?.chainName } }})
   }
 

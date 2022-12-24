@@ -12,6 +12,7 @@ const { Title } = Typography
 
 const ListProductDuplicate = () => {
   const { state } = useLocation()
+  const location = useLocation()
   const PAGE_SIZE = 100
   const [total, setTotal] = useState(1)
   const [page, setPage] = useState(1)
@@ -19,6 +20,7 @@ const ListProductDuplicate = () => {
   const [listDataDuplicate, setListDataDuplicate] = useState([])
   const [reload, setReload] = useState(false)
 
+  console.log(state, location)
   useEffect(() => {
     setLoading(true)
     const getData = async() => {

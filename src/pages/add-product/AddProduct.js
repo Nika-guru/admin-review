@@ -524,7 +524,7 @@ const AddProduct = () => {
                                                 <Input placeholder="Enter Founder Name" />
                                             </Form.Item>
                                         </div>
-                                        <div className='form-add-item'>
+                                        {/* <div className='form-add-item'>
                                             <div className='form-add-item-label'>Chain ID:</div>
                                             <Form.Item
                                                 {...restField}
@@ -538,7 +538,7 @@ const AddProduct = () => {
                                             >
                                                 <Input placeholder="Enter chain id" />
                                             </Form.Item>
-                                        </div>
+                                        </div> */}
                                         <div className='form-add-item'>
                                             <div className='form-add-item-label'>address:</div>
                                             <Form.Item
@@ -1025,7 +1025,7 @@ const AddProduct = () => {
                                                     },
                                                 ]}
                                             >
-                                                <Input placeholder="Enter contract address"/>
+                                                <Input placeholder='Enter contract address'/>
                                             </Form.Item>
                                         </div>
                                         <div className='form-add-item'>
