@@ -87,6 +87,11 @@ function Sidenav({ color }) {
       image: billing,
       label: 'Monitor'
     },
+    {
+      url: 'news',
+      image: billing,
+      label: 'News'
+    },
     // {
     //   url: 'tables',
     //   image: tables,

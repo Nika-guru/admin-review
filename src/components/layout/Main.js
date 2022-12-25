@@ -21,6 +21,7 @@ import SignIn from "../modal/SignIn";
 import Monitor from "../../pages/Monitor";
 import AddService from "../monitor/AddService";
 import ListProductDuplicate from "../product-tab/ListProductDuplicate";
+import { News } from "../../pages/news/News";
 
 
 const { Header: AntHeader, Content, Sider } = Layout;
@@ -109,6 +110,7 @@ const Main = () => {
               <Route path='' element={<Home />} />
               <Route path='dashboard' element={<Home />} />
               <Route path='users' element={<User />} />
+              <Route path='news' element={< News/>} />
               <Route path='reviews'>
                 <Route path='' element={<Reviews />} />
                 <Route path=':reviewId/detail' element={<DetailReview />} />
