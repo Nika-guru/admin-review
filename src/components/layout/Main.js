@@ -21,7 +21,8 @@ import SignIn from "../modal/SignIn";
 import Monitor from "../../pages/Monitor";
 import AddService from "../monitor/AddService";
 import ListProductDuplicate from "../product-tab/ListProductDuplicate";
-import { News } from "../../pages/news/News";
+import News from "../../pages/news/News";
+import AddNews from "../../pages/add-news/AddNews";
 
 
 const { Header: AntHeader, Content, Sider } = Layout;
@@ -136,6 +137,10 @@ const Main = () => {
                 <Route path='add-service' element={<AddService />} />
               </Route>
               <Route path='*' element={<NotFound />} />
+              <Route path="news">
+                <Route path='add-news' element={<AddNews />} />
+                {/* <Route path=":newsId"></Route> */}
+              </Route>
             </Routes>
           </ChainNameContext.Provider>
         </Content>

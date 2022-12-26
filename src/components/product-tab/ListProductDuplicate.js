@@ -167,7 +167,7 @@ const ListProductDuplicate = () => {
                 record?.address !== null && record?.address !== ''
                 ? 
                 <>
-                    <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
+                    <a href={record?.linkScan} target="_blank" rel="noreferrer">{record?.address}</a>
                     <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
                 </>
                 : ''

@@ -24,7 +24,7 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
 
   const handleEditProduct = async(e, record) => {
     e.stopPropagation()
-    // navigate(`../products/${record?.id}`, { state: { isEdit: true }})
+    navigate(`../products/${record?.id}`, { state: { isEdit: true }})
   }
 
 //   const handleClickItem = (record) => {
@@ -95,31 +95,6 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
         </span>)
     },
     {
-        title: "Chain Name",
-        dataIndex: "chainName",
-        render: (_, record) => (<span>
-            {record?.chainName !== null ? record?.chainName : ''}
-        </span>)
-    },
-    {
-        title: "Address",
-        dataIndex: "address",
-        render: (_, record) => (<span>
-            {record?.type === 'token' 
-            ? (
-                record?.address !== null && record?.address !== ''
-                ? 
-                (<>
-                    <a href={record?.linkScan} rel="noreferrer">{record?.address}</a>
-                    <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
-                </>)
-                : ''
-                )
-            : ''
-        }
-        </span>)
-    },
-    {
         title: 'Sub Category',
         dataIndex: "subcategory",
         render: (_, record) => <>
@@ -129,6 +104,32 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
         </>
     },
     {
+        title: "Chain Name",
+        dataIndex: "chainName",
+        render: (_, record) => (<span>
+            {record?.chainName !== null ? record?.chainName : ''}
+        </span>)
+    },
+    {
+        title: "Address",
+        dataIndex: "address",
+        render: (_, record) => (<>
+            {record?.type === 'token' 
+            ? (
+                record?.address !== null && record?.address !== ''
+                ? 
+                (<div style={{ display: 'flex', alignItems: 'center' }}>
+                    <a href={record?.linkScan} target="_blank" rel="noreferrer" class='table-list-product-address'>{record?.address}</a>
+                    <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, record?.address)}/>
+                </div>)
+                : ''
+                )
+            : ''
+        }
+        </>)
+    },
+
+    {
         title: 'From By',
         dataIndex: "fromBy",
         render: (_, record) => (<span>
@@ -137,10 +138,12 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
     },
     {
         title: "Action",
-        render: (_, record) => (<div className='product-icon-action'>
-            {/* <EditOutlined onClick={(e) => handleEditProduct(e, record)}/> */}
+        render: (_, record) => (
+        <div className='product-icon-action'>
+            <EditOutlined onClick={(e) => handleEditProduct(e, record)}/>
             <DeleteOutlined onClick={(e) => handleDeleteProduct(e, record)}/>
-        </div>)
+        </div>
+        )
     },
   ]
 
@@ -155,6 +158,7 @@ const ListProduct = ({ loading, total, setReloadProduct, setPage, page, dataSear
             columns={columns}
             dataSource={dataSearch}
             pagination={{
+                current: page,
                 defaultCurrent: 1,
                 pageSize: PAGE_SIZE,
                 total: total,

@@ -13,7 +13,7 @@ const data = [
         src: 'https://www.facebook.com/',
         image: bitcoin,
         type: 'coin',
-        marketcap : 434736267,
+        marketcap: 434736267,
         chainId: 0,
         tag: 'DEX'
     },
@@ -24,7 +24,7 @@ const data = [
         src: 'https://www.facebook.com/',
         image: bitcoin,
         type: 'coin',
-        marketcap : 434736267,
+        marketcap: 434736267,
         chainId: 0,
         tag: 'CEX'
     },
@@ -35,7 +35,7 @@ const data = [
         src: 'https://www.facebook.com/',
         image: bitcoin,
         type: 'coin',
-        marketcap : 434736267,
+        marketcap: 434736267,
         chainId: 0,
         tag: ''
     },
@@ -57,13 +57,13 @@ const TableService = () => {
 
     const [page, setPage] = useState(1)
 
-    const handleDeleteService = async(e, record) => {
+    const handleDeleteService = async (e, record) => {
         e.stopPropagation()
-        await del('service_monitor/remove-service', {  "base":  record?.base })
+        await del('service_monitor/remove-service', { "base": record?.base })
         setReloadService(true)
     }
 
-    const handleDeleteEndpoint = async(e, item, record) => {
+    const handleDeleteEndpoint = async (e, item, record) => {
         e.stopPropagation()
         const data = {
             base: record?.base,
@@ -73,7 +73,7 @@ const TableService = () => {
         setReloadService(true)
     }
 
-    const handleDeleteMaintain = async(e, item, record) => {
+    const handleDeleteMaintain = async (e, item, record) => {
         e.stopPropagation()
         const data = {
             base: record?.base,
@@ -83,7 +83,7 @@ const TableService = () => {
         setReloadService(true)
     }
 
-    const handleAddEndPoint = async(e) => {
+    const handleAddEndPoint = async (e) => {
         if (e.key === 'Enter') {
             const data = {
                 base: addEndpoint?.base,
@@ -98,7 +98,7 @@ const TableService = () => {
             setReloadService(true)
         }
     }
-    const handleAddMaintain = async(e) => {
+    const handleAddMaintain = async (e) => {
         if (e.key === 'Enter') {
             const data = {
                 base: addMaintain?.base,
@@ -118,7 +118,7 @@ const TableService = () => {
         {
             title: "#",
             dataIndex: "key",
-            render: (_, record, index)=>(<span style={{ color: '#A8ADB3' }}>
+            render: (_, record, index) => (<span style={{ color: '#A8ADB3' }}>
                 {(page - 1) * PAGE_SIZE + index + 1}
             </span>)
         },
@@ -212,7 +212,7 @@ const TableService = () => {
                             </Tooltip>
                         </div>
                     )}
-                
+
                 </>
             )
         },
@@ -225,7 +225,7 @@ const TableService = () => {
     ]
 
     useEffect(() => {
-        const getAll = async() => {
+        const getAll = async () => {
             const services = await get('service_monitor/all')
             setServices(services?.data?.services)
             setReloadService(false)

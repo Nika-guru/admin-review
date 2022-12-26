@@ -3,7 +3,7 @@ import { Row, Col, Form, Input, Button, Space, Select, Card, Image, Spin, messag
 import { MinusCircleOutlined, PlusOutlined, CopyOutlined } from '@ant-design/icons'
 import { del, get, patch } from '../../api/products'
 import { regexFloatNumber } from '../../utils/regex'
-import {  useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useParams, useLocation } from 'react-router-dom'
 import _ from 'lodash'
 import { getCookie, STORAGEKEY } from '../../utils/storage'
@@ -12,7 +12,7 @@ const { Option } = Select
 const { TextArea } = Input
 
 const DetailProduct = () => {
-  const navigate = useNavigate()
+    const navigate = useNavigate()
     const userInfo = getCookie(STORAGEKEY.USER_INFO)
     const { productId } = useParams()
     const TYPE_COIN = 'coin'
@@ -35,9 +35,9 @@ const DetailProduct = () => {
     const [params, setParams] = useState([])
     const [defaultValueForm, setDefaultValueForm] = useState()
 
-    const handleDeleteProduct = async(e, record) => {
+    const handleDeleteProduct = async (e, record) => {
         // e.stopPropagation()
-        try{
+        try {
             document.getElementById(`btnDelete`).setAttribute('disabled', 'disabled')
             document.getElementById(`btnEdit`).setAttribute('disabled', 'disabled')
             await del(`reviews/product/productId=${record?.id}`)
@@ -46,7 +46,7 @@ const DetailProduct = () => {
                 description: `Delete successfully`,
             })
             navigate('/dashboard')
-        }catch(e){
+        } catch (e) {
             notification.warn({
                 message: 'Warning',
                 description: `Delete ${record?.name ? record?.name : record?.id} failed, try again later`,
@@ -54,10 +54,10 @@ const DetailProduct = () => {
             document.getElementById(`btnDelete`).removeAttribute('disabled')
             document.getElementById(`btnEdit`).removeAttribute('disabled')
         }
-      }
+    }
 
 
-    const onFinish = async(values) => {
+    const onFinish = async (values) => {
         const regex = /^[0-9]*$/
         const {
             communities,
@@ -77,25 +77,23 @@ const DetailProduct = () => {
             website,
             websites,
             contract,
+            holders,
             ...rest
         } = values
 
         let body = {}
         const listSub = []
 
+        console.log(subCategories)
+
         subCategory?.forEach((item) => {
-            if (item.match(regex)) {
-                const newItem = subCategories?.find((itemSub) => itemSub?.id === parseInt(item))
-                listSub.push(newItem?.name)
+            const newItem = subCategories?.find((itemSub) => itemSub?.name === item)
+            if (newItem) {
+                console.log('ton tai')
+                listSub.push(item)
             } else {
-                const newItem = subCategories?.find((itemSub) => itemSub?.name === item)
-                if (newItem) {
-                    console.log('ton tai')
-                    listSub.push(item)
-                } else {
-                    console.log('khong ton tai')
-                    listSub.push(`new:${item}`)
-                }
+                console.log('khong ton tai')
+                listSub.push(`new:${item}`)
             }
         })
 
@@ -132,7 +130,8 @@ const DetailProduct = () => {
                 userName: userInfo?.userName,
                 userRole: `${userInfo?.userrole}`,
                 contract: { contract: contract },
-                detail:  {
+                holders: parseInt(holders),
+                detail: {
                     ...detail,
                     community: newCommunity,
                     decimals: newDecimals,
@@ -156,7 +155,8 @@ const DetailProduct = () => {
                 userName: userInfo?.userName,
                 userRole: `${userInfo?.userrole}`,
                 contract: { contract: contract },
-                detail:  {
+                holders: parseInt(holders),
+                detail: {
                     ...detail,
                     community: newCommunity,
                     decimals: newDecimals,
@@ -175,8 +175,8 @@ const DetailProduct = () => {
         setReloadData(true)
         setIsEditProduct(false)
     }
-    
-    
+
+
     const handleChangeType = (value) => {
         if (value === TYPE_COIN) {
             const category = categories?.find((item) => item?.name === 'Crypto Projects')
@@ -184,22 +184,24 @@ const DetailProduct = () => {
             form.setFieldsValue({ "category": category?.name })
         }
     }
-      
-    const handleChangeCategory = (value) => {
+
+    const handleChangeCategory = async (value) => {
         const category = categories?.find((item) => item?.name === value)
         setDefaultCategory(category?.id)
+        const subCategory = await get(`reviews/sub-category/categoryId=${defaultCategory}`)
+        setSubCategories(subCategory?.data?.subCategories)
     }
 
+    // useEffect(() => {
+    //     const getSubCategory = async () => {
+    //         const subCategory = await get(`reviews/sub-category/categoryId=${defaultCategory}`)
+    //         setSubCategories(subCategory?.data?.subCategories)
+    //     }
+    //     getSubCategory()
+    // }, [defaultCategory])
+console.log(333333)
     useEffect(() => {
-        const getSubCategory = async() => {
-            const subCategory = await get(`reviews/sub-category/categoryId=${defaultCategory}`)
-            setSubCategories(subCategory?.data?.subCategories)
-        }
-        getSubCategory()
-    }, [defaultCategory])
-
-    useEffect(() => {
-        const getCategory = async() => {
+        const getCategory = async () => {
             const categories = await get('reviews/category')
             setCategories(categories?.data?.categories)
         }
@@ -207,9 +209,11 @@ const DetailProduct = () => {
     }, [])
 
     useEffect(() => {
-        const getDataProduct = async() => {
+        console.log(8767868)
+        const getDataProduct = async () => {
             const product = await get(`reviews/product/productId=${productId}`)
             setProductInfo([product?.data])
+            setReloadData(false)
         }
         getDataProduct()
     }, [productId, reloadData])
@@ -250,7 +254,7 @@ const DetailProduct = () => {
                 })
             }
         })
-        
+
         const category = categories?.find((item) => item?.name === productInfo[0]?.category)
         if (category === undefined) {
             setDefaultCategory('')
@@ -271,13 +275,13 @@ const DetailProduct = () => {
         e.stopPropagation()
         navigator.clipboard.writeText(text)
         message.success({
-          content: 'Copy address successfully',
-          duration: 3
+            content: 'Copy address successfully',
+            duration: 3
         })
     }
 
     useEffect(() => {
-        const getParams = async() => {
+        const getParams = async () => {
             const tokens = await get(`reviews/product/list-value-fields`)
             const chainName = tokens?.data?.chainName?.filter((item) => item !== '')
             const newParams = {
@@ -297,11 +301,11 @@ const DetailProduct = () => {
         { name: 'symbol', value: productInfo[0]?.symbol },
         { name: 'name', value: productInfo[0]?.name },
         { name: 'category', value: productInfo[0]?.category !== null ? productInfo[0]?.category : '' },
-        { name: 'subCategory', value: (productInfo[0]?.subcategory !== '') ?productInfo[0]?.subcategory?.split(',')?.join(';')?.split(';') : [] },
+        { name: 'subCategory', value: (productInfo[0]?.subcategory !== '') ? productInfo[0]?.subcategory?.split(',')?.join(';')?.split(';') : [] },
         // { name: 'newCategory', value: '' },
         // { name: 'newSubCategory', value: [] },
         { name: 'image', value: productInfo[0]?.image },
-        { name: 'desc', value: productInfo[0]?.desc !== null ? productInfo[0]?.desc : ''  },
+        { name: 'desc', value: productInfo[0]?.desc !== null ? productInfo[0]?.desc : '' },
         { name: 'isWarning', value: productInfo[0]?.isWarning },
         { name: 'isshow', value: productInfo[0]?.isshow },
         { name: ['evaluate', 'isScam'], value: false },
@@ -311,11 +315,11 @@ const DetailProduct = () => {
         { name: ['evaluate', 'userName'], value: [] },
         { name: ['evaluate', 'userRole'], value: [] },
         { name: ['evaluate', 'isVerify'], value: false },
-        { name: ['detail', 'marketcap'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.marketcap : '' },
+        { name: ['detail', 'marketCap'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.marketCap : '' },
         { name: ['detail', 'totalSupply'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.totalSupply : '' },
-        { name: ['detail', 'maxSupply'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.maxSupply : ''},
+        { name: ['detail', 'maxSupply'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.maxSupply : '' },
         { name: ['detail', 'volumeTrading'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.volumeTrading : '' },
-        { name: ['detail', 'holder'], value: productInfo[0]?.detail !== null ? productInfo[0]?.detail?.holder : ''},
+        { name: 'holders', value: productInfo[0]?.holders !== null ? productInfo[0]?.holders : '' },
         { name: 'contract', value: productInfo[0]?.contract !== null ? productInfo[0]?.contract?.contract : [] },
         { name: 'moreInfo', value: productInfo[0]?.detail !== null && productInfo[0]?.detail?.moreInfo ? productInfo[0]?.detail?.moreInfo : [] },
         { name: 'founders', value: productInfo[0]?.detail?.founders ? productInfo[0]?.detail?.founders : [] },
@@ -343,7 +347,7 @@ const DetailProduct = () => {
         {
             name: ['community', 'instagram'],
             value: productInfo[0]?.detail !== null && productInfo[0]?.detail?.community && productInfo[0]?.detail?.community['instagram']
-            ? productInfo[0]?.detail?.community['instagram'] : []
+                ? productInfo[0]?.detail?.community['instagram'] : []
         },
         {
             name: ['community', 'youtube'],
@@ -395,63 +399,64 @@ const DetailProduct = () => {
                     >
                         <div className='form-add-title'>Detail Product Infomation</div>
                         <Space direction="vertical" size="middle" style={{ display: 'flex' }}>
-                            
+
                             <Card
                                 title={<span className='form-add-card-title'>Project Info</span>}
                                 bordered={true}
                                 extra={
-                                <>
-                                <>
-                                <Space direction="horizontal">
-                                      <Switch checkedChildren="Scam" unCheckedChildren="Not scam" defaultChecked />
-                                      <Switch checkedChildren="Warning" unCheckedChildren="Not warning" defaultChecked />
-                                  </Space>
-                                <br />
-                                <br />
-                            
-                                  <Space direction="horizontal">
-                                  <Button
-                                    type='primary'
-                                    style={{ right: '5%' }}
-                                    id='btnEdit'
-                                    onClick={() => setIsEditProduct(true)}
-                                >
-                                    Edit Product
-                                </Button>
-                                
-                                <Popconfirm 
-                                      title="Are you sure delete this produt?" 
-                                      okText="Yes"
-                                      cancelText="No"
-                                      onConfirm={(e) => {
-                                        handleDeleteProduct(e, productInfo[0])
-                                      }}
-                                      >
-                                <Button
-                                    type='danger'
-                                    id='btnDelete'
-                                >
-                                    Delete Product
-                                </Button>
-                                </Popconfirm>
+                                    <>
+                                        <>
+                                            <Space direction="horizontal">
+                                                <Switch checkedChildren="Scam" unCheckedChildren="Not scam" defaultChecked />
+                                                <Switch checkedChildren="Warning" unCheckedChildren="Not warning" defaultChecked />
+                                            </Space>
+                                            <br />
+                                            <br />
 
-                              </Space>
-                                      
-                        </>
-                                </>
+                                            <Space direction="horizontal">
+                                                <Button
+                                                    disabled={isEditProduct}
+                                                    type='primary'
+                                                    style={{ right: '5%' }}
+                                                    id='btnEdit'
+                                                    onClick={() => setIsEditProduct(true)}
+                                                >
+                                                    Edit Product
+                                                </Button>
+
+                                                <Popconfirm
+                                                    title="Are you sure delete this product ?"
+                                                    okText="Yes"
+                                                    cancelText="No"
+                                                    onConfirm={(e) => {
+                                                        handleDeleteProduct(e, productInfo[0])
+                                                    }}
+                                                >
+                                                    <Button
+                                                        type='danger'
+                                                        id='btnDelete'
+                                                    >
+                                                        Delete Product
+                                                    </Button>
+                                                </Popconfirm>
+
+                                            </Space>
+
+                                        </>
+                                    </>
                                 }
                             >
-                                
-                                 <div className='form-add-item'>
+
+                                <div className='form-add-item'>
                                     <div className='form-add-item-label'>Image:</div>
                                     {isEditProduct ? (
                                         <Form.Item
                                             name="image"
                                         >
-                                            <Input placeholder='https://'/>
+                                            <Input placeholder='https://' />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>
-                                        {productInfo[0]?.image && <Image style={{ width: '5rem' }} src={productInfo[0]?.image} preview={false}/>}
+                                        {productInfo[0]?.image && <Image style={{ width: '5rem' }} src={productInfo[0]?.image} preview={false} />}
                                     </span>)}
                                 </div>
                                 <div className='form-add-item'>
@@ -480,14 +485,14 @@ const DetailProduct = () => {
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>
                                         {productInfo[0]?.address}
-                                        <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, productInfo[0]?.address)}/>
+                                        <CopyOutlined style={{ marginLeft: '0.5rem' }} onClick={(e) => copyAddress(e, productInfo[0]?.address)} />
                                     </span>)}
                                 </div>
                                 <div className='form-add-item'>
                                     <div className='form-add-item-label'>Chain ID:</div>
                                     {isEditProduct ? (
                                         <Form.Item name="chainId">
-                                            <Input type='number'/>
+                                            <Input type='number' />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>{productInfo[0]?.chainId}</span>)}
                                 </div>
@@ -548,7 +553,7 @@ const DetailProduct = () => {
                                                 onClick={() => setTypeCategory(TYPE_ADD_CATEGORY)}
                                             >
                                                 Add Category:
-                                            </span>    
+                                            </span>
                                         </div>
                                     </div>
                                     {isEditProduct ? (
@@ -593,8 +598,8 @@ const DetailProduct = () => {
                                                         label: item?.name,
                                                     }))}
                                                 />
-                                                    
-                                            ) : 
+
+                                            ) :
                                                 <Select
                                                     placeholder="Please select category"
                                                     mode="tags"
@@ -610,7 +615,7 @@ const DetailProduct = () => {
                                     <div className='form-add-item-label'>Description:</div>
                                     {isEditProduct ? (
                                         <Form.Item name='desc'>
-                                            <TextArea placeholder="Enter Description" rows={4}/>
+                                            <TextArea placeholder="Enter Description" rows={4} />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>{productInfo[0]?.desc}</span>)}
                                 </div>
@@ -638,14 +643,14 @@ const DetailProduct = () => {
                                     <div className='form-add-item-label'>Holders:</div>
                                     {isEditProduct ? (
                                         <Form.Item
-                                            name={['detail', 'holder']}
+                                            name='holders'
                                         >
                                             <Input placeholder="Enter Holders" />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>{productInfo[0]?.holders}</span>)}
                                 </div>
                             </Card>
-                            
+
                             {/* contract */}
                             <Card
                                 title={<span className='form-add-card-title'>Contract</span>}
@@ -654,69 +659,69 @@ const DetailProduct = () => {
                                 {isEditProduct ? (
                                     <Form.List name="contract">
                                         {(fields, { add, remove }) => (
-                                        <>
-                                            {fields.map(({ key, name, ...restField }) => (
-                                                <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Col span={23}>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Chain Name:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'chainName']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing name',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter Founder Name" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Chain ID:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'chainId']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing name',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter chain id" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>address:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'address']}
-                                                            >
-                                                                <Input placeholder="Enter address" />
-                                                            </Form.Item>
-                                                        </div>
-                                                    </Col>
-                                                    <Col span={1}>
-                                                        <MinusCircleOutlined onClick={() => remove(name)} />
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            <Form.Item>
-                                                <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                    Add New Contract
-                                                </Button>
-                                            </Form.Item>
-                                        </>
+                                            <>
+                                                {fields.map(({ key, name, ...restField }) => (
+                                                    <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Col span={23}>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Chain Name:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'chainName']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing name',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter Founder Name" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Chain ID:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'chainId']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing name',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter chain id" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>address:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'address']}
+                                                                >
+                                                                    <Input placeholder="Enter address" />
+                                                                </Form.Item>
+                                                            </div>
+                                                        </Col>
+                                                        <Col span={1}>
+                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+                                                <Form.Item>
+                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                        Add New Contract
+                                                    </Button>
+                                                </Form.Item>
+                                            </>
                                         )}
                                     </Form.List>
                                 ) : (
                                     <span className='form-add-item-content'>
-                                        {productInfo[0]?.contract !== null && productInfo[0]?.contract[`contract`]  && productInfo[0]?.contract[`contract`]?.map((item) => (
+                                        {productInfo[0]?.contract !== null && productInfo[0]?.contract[`contract`] && productInfo[0]?.contract[`contract`]?.map((item) => (
                                             <>
-                                            <div>{item?.chainName}: <span>{item?.address}</span></div>
-                                            <br></br>
+                                                <div>{item?.chainName}: <span>{item?.address}</span></div>
+                                                <br></br>
                                             </>
                                         ))}
                                     </span>
@@ -733,46 +738,46 @@ const DetailProduct = () => {
                                         {isEditProduct ? (
                                             <Form.List name="moreInfo">
                                                 {(fields, { add, remove }) => (
-                                                <>
-                                                    {fields.map(({ key, name, ...restField }) => (
-                                                        <Space
-                                                            key={key}
-                                                            style={{ display: 'flex', marginBottom: 8 }}
-                                                            align="baseline"
-                                                        >
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'key']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing key',
-                                                                    },
-                                                                ]}
+                                                    <>
+                                                        {fields.map(({ key, name, ...restField }) => (
+                                                            <Space
+                                                                key={key}
+                                                                style={{ display: 'flex', marginBottom: 8 }}
+                                                                align="baseline"
                                                             >
-                                                                <Input placeholder="Enter key" />
-                                                            </Form.Item>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'value']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing value',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter Value" />
-                                                            </Form.Item>
-                                                            <MinusCircleOutlined onClick={() => remove(name)} />
-                                                        </Space>
-                                                    ))}
-                                                    <Form.Item>
-                                                        <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                            Add More Info
-                                                        </Button>
-                                                    </Form.Item>
-                                                </>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'key']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing key',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter key" />
+                                                                </Form.Item>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'value']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing value',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter Value" />
+                                                                </Form.Item>
+                                                                <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            </Space>
+                                                        ))}
+                                                        <Form.Item>
+                                                            <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                                Add More Info
+                                                            </Button>
+                                                        </Form.Item>
+                                                    </>
                                                 )}
                                             </Form.List>
                                         ) : (
@@ -785,7 +790,7 @@ const DetailProduct = () => {
                                     </Col>
                                 </Row>
                             </Card>
-                    
+
                             {/* founders */}
                             <Card
                                 title={<span className='form-add-card-title'>Founder</span>}
@@ -794,55 +799,55 @@ const DetailProduct = () => {
                                 {isEditProduct ? (
                                     <Form.List name="founders">
                                         {(fields, { add, remove }) => (
-                                        <>
-                                            {fields.map(({ key, name, ...restField }) => (
-                                                <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Col span={23}>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Founder Name:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'name']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing name',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter Founder Name" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Social:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'social']}
-                                                            >
-                                                                <Select
-                                                                    placeholder="Enter multiple link social"
-                                                                    mode="tags"
-                                                                />
-                                                            </Form.Item>
-                                                        </div>
-                                                    </Col>
-                                                    <Col span={1}>
-                                                        <MinusCircleOutlined onClick={() => remove(name)} />
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            <Form.Item>
-                                                <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                    Add New Founder
-                                                </Button>
-                                            </Form.Item>
-                                        </>
+                                            <>
+                                                {fields.map(({ key, name, ...restField }) => (
+                                                    <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Col span={23}>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Founder Name:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'name']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing name',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter Founder Name" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Social:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'social']}
+                                                                >
+                                                                    <Select
+                                                                        placeholder="Enter multiple link social"
+                                                                        mode="tags"
+                                                                    />
+                                                                </Form.Item>
+                                                            </div>
+                                                        </Col>
+                                                        <Col span={1}>
+                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+                                                <Form.Item>
+                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                        Add New Founder
+                                                    </Button>
+                                                </Form.Item>
+                                            </>
                                         )}
                                     </Form.List>
                                 ) : (
                                     <span className='form-add-item-content'>
                                         {productInfo[0]?.detail?.founders && productInfo[0]?.detail?.founders?.map((item) => (
-                                            <div style={{ display: 'flex', alignItems: 'center' }}>{item?.name}: 
+                                            <div style={{ display: 'flex', alignItems: 'center' }}>{item?.name}:
                                                 <span style={{ marginLeft: '1rem' }}>
                                                     {item?.social?.map((itemLink) => (
                                                         <div>{itemLink}</div>
@@ -853,7 +858,7 @@ const DetailProduct = () => {
                                     </span>
                                 )}
                             </Card>
-                            
+
                             {/* funds */}
                             <Card
                                 title={<span className='form-add-card-title'>Funds</span>}
@@ -862,66 +867,66 @@ const DetailProduct = () => {
                                 {isEditProduct ? (
                                     <Form.List name="funds">
                                         {(fields, { add, remove }) => (
-                                        <>
-                                            {fields.map(({ key, name, ...restField }) => (
-                                                <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Col span={23}>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Fund Name:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'name']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing name',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter name" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Link Image:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'image']}
-                                                                rules={[
-                                                                    {
-                                                                        type: 'url',
-                                                                        message: 'Enter a valid url image!',
-                                                                    }
-                                                                ]}
-                                                            >
-                                                                <Input placeholder='Enter Link Image'/>
-                                                            </Form.Item>
-                                                        </div>
-                                                    </Col>
-                                                    <Col span={1}>
-                                                        <MinusCircleOutlined onClick={() => remove(name)} />
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            <Form.Item>
-                                                <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                    Add New Fund
-                                                </Button>
-                                            </Form.Item>
-                                        </>
+                                            <>
+                                                {fields.map(({ key, name, ...restField }) => (
+                                                    <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Col span={23}>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Fund Name:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'name']}
+                                                                    rules={[
+                                                                        {
+                                                                            required: true,
+                                                                            message: 'Missing name',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter name" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Link Image:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'image']}
+                                                                    rules={[
+                                                                        {
+                                                                            type: 'url',
+                                                                            message: 'Enter a valid url image!',
+                                                                        }
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder='Enter Link Image' />
+                                                                </Form.Item>
+                                                            </div>
+                                                        </Col>
+                                                        <Col span={1}>
+                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+                                                <Form.Item>
+                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                        Add New Fund
+                                                    </Button>
+                                                </Form.Item>
+                                            </>
                                         )}
                                     </Form.List>
                                 ) : (
                                     <span className='form-add-item-content'>
                                         {productInfo[0]?.detail?.funds && productInfo[0]?.detail?.funds?.map((item) => (
                                             <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                {item?.name}: 
-                                                <Image src={item?.image} preview={false}/>
+                                                {item?.name}:
+                                                <Image src={item?.image} preview={false} />
                                             </div>
                                         ))}
                                     </span>
                                 )}
                             </Card>
-                            
+
                             {/* project detail */}
                             <Card
                                 title={<span className='form-add-card-title'>Project Detail</span>}
@@ -936,7 +941,7 @@ const DetailProduct = () => {
                                             <Input />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>
-                                        {productInfo[0]?.detail?.marketcap != null ? productInfo[0]?.detail?.marketcap : 0}
+                                        {productInfo[0]?.detail?.marketCap != null ? productInfo[0]?.detail?.marketCap : 0}
                                     </span>)}
                                 </div>
                                 <div className='form-add-item'>
@@ -971,7 +976,7 @@ const DetailProduct = () => {
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>{productInfo[0]?.detail?.volumeTrading != null ? productInfo[0]?.detail?.volumeTrading : 0}</span>)}
                                 </div>
-                                <div className='form-add-item'>
+                                {/* <div className='form-add-item'>
                                     <div className='form-add-item-label'>Holders:</div>
                                     {isEditProduct ? (
                                         <Form.Item
@@ -980,9 +985,9 @@ const DetailProduct = () => {
                                             <Input />
                                         </Form.Item>
                                     ) : (<span className='form-add-item-content'>{productInfo[0]?.detail?.holders != null ? productInfo[0]?.detail?.holders : 0}</span>)}
-                                </div>
+                                </div> */}
                             </Card>
-                    
+
                             {/* community */}
                             <Card
                                 title={<span className='form-add-card-title'>Community</span>}
@@ -1061,41 +1066,41 @@ const DetailProduct = () => {
                                             initialValue={defaultValueForm}
                                         >
                                             {(fields, { add, remove }) => (
-                                            <>
-                                                {fields.map(({ key, name, ...restField }) => (
-                                                    <div className='form-add-item'>
-                                                        <div className='form-add-item-label'>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'key']}
-                                                            >
-                                                                <Input placeholder="Enter key" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-new'>
-                                                            <div className='form-add-new-item'>
-                                                                <div className='form-add-item'>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'value']}
-                                                                    >
-                                                                        <Select
-                                                                            placeholder="Enter Link url"
-                                                                            mode="tags"
-                                                                        />
-                                                                    </Form.Item>
-                                                                </div>
+                                                <>
+                                                    {fields.map(({ key, name, ...restField }) => (
+                                                        <div className='form-add-item'>
+                                                            <div className='form-add-item-label'>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'key']}
+                                                                >
+                                                                    <Input placeholder="Enter key" />
+                                                                </Form.Item>
                                                             </div>
-                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            <div className='form-add-new'>
+                                                                <div className='form-add-new-item'>
+                                                                    <div className='form-add-item'>
+                                                                        <Form.Item
+                                                                            {...restField}
+                                                                            name={[name, 'value']}
+                                                                        >
+                                                                            <Select
+                                                                                placeholder="Enter Link url"
+                                                                                mode="tags"
+                                                                            />
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </div>
+                                                                <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                                <Form.Item>
-                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                        Add New Community
-                                                    </Button>
-                                                </Form.Item>
-                                            </>
+                                                    ))}
+                                                    <Form.Item>
+                                                        <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                            Add New Community
+                                                        </Button>
+                                                    </Form.Item>
+                                                </>
                                             )}
                                         </Form.List>
                                     </>
@@ -1103,21 +1108,21 @@ const DetailProduct = () => {
                                     <span className='form-add-item-content'>
                                         {productInfo[0]?.detail?.community != null && Object.keys(productInfo[0]?.detail?.community).map((key) => {
                                             return (
-                                            <>
-                                            <div style={{ display: 'flex' }}>
-                                                <span style={{ textTransform: 'capitalize' }}>{key}:</span>
-                                                <div style={{ marginLeft: '0.5rem' }}>
-                                                    {productInfo[0]?.detail?.community[key]?.map((item) => (
-                                                        <>
-                                                        <a href={item} target='_blank'  rel="noreferrer">{item}</a>
-                                                        <br></br>
-                                                        </>
-                                                        
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <br></br>
-                                            </>
+                                                <>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <span style={{ textTransform: 'capitalize' }}>{key}:</span>
+                                                        <div style={{ marginLeft: '0.5rem' }}>
+                                                            {productInfo[0]?.detail?.community[key]?.map((item) => (
+                                                                <>
+                                                                    <a href={item} target='_blank' rel="noreferrer">{item}</a>
+                                                                    <br></br>
+                                                                </>
+
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <br></br>
+                                                </>
                                             )
 
                                         })}
@@ -1156,53 +1161,53 @@ const DetailProduct = () => {
                                         </div>
                                         <Form.List name="sourceCodes">
                                             {(fields, { add, remove }) => (
-                                            <>
-                                                {fields.map(({ key, name, ...restField }) => (
-                                                    <div className='form-add-item'>
-                                                        <div className='form-add-item-label'>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'key']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing key',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter key" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-new'>
-                                                            <div className='form-add-new-item'>
-                                                                <div className='form-add-item'>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'value']}
-                                                                        rules={[
-                                                                            {
+                                                <>
+                                                    {fields.map(({ key, name, ...restField }) => (
+                                                        <div className='form-add-item'>
+                                                            <div className='form-add-item-label'>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'key']}
+                                                                    rules={[
+                                                                        {
                                                                             required: true,
-                                                                            message: 'Missing value',
-                                                                            },
-                                                                        ]}
-                                                                    >
-                                                                        <Select
-                                                                            placeholder="Enter Link url"
-                                                                            mode="tags"
-                                                                        />
-                                                                    </Form.Item>
-                                                                </div>
+                                                                            message: 'Missing key',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter key" />
+                                                                </Form.Item>
                                                             </div>
-                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            <div className='form-add-new'>
+                                                                <div className='form-add-new-item'>
+                                                                    <div className='form-add-item'>
+                                                                        <Form.Item
+                                                                            {...restField}
+                                                                            name={[name, 'value']}
+                                                                            rules={[
+                                                                                {
+                                                                                    required: true,
+                                                                                    message: 'Missing value',
+                                                                                },
+                                                                            ]}
+                                                                        >
+                                                                            <Select
+                                                                                placeholder="Enter Link url"
+                                                                                mode="tags"
+                                                                            />
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </div>
+                                                                <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                                <Form.Item>
-                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                        Add New Source Code
-                                                    </Button>
-                                                </Form.Item>
-                                            </>
+                                                    ))}
+                                                    <Form.Item>
+                                                        <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                            Add New Source Code
+                                                        </Button>
+                                                    </Form.Item>
+                                                </>
                                             )}
                                         </Form.List>
                                     </>
@@ -1210,20 +1215,20 @@ const DetailProduct = () => {
                                     <span className='form-add-item-content'>
                                         {productInfo[0]?.detail?.sourceCode != null && Object.keys(productInfo[0]?.detail?.sourceCode).map((key) => {
                                             return (
-                                            <>
-                                            <div style={{ display: 'flex' }}>
-                                                <span style={{ textTransform: 'capitalize' }}>{key}:</span>
-                                                <div style={{ marginLeft: '0.5rem' }}>
-                                                    {productInfo[0]?.detail?.sourceCode[key]?.map((item) => (
-                                                        <>
-                                                        <a href={item} target='_blank'  rel="noreferrer">{item}</a>
-                                                        <br></br>
-                                                        </>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <br></br>
-                                            </>)
+                                                <>
+                                                    <div style={{ display: 'flex' }}>
+                                                        <span style={{ textTransform: 'capitalize' }}>{key}:</span>
+                                                        <div style={{ marginLeft: '0.5rem' }}>
+                                                            {productInfo[0]?.detail?.sourceCode[key]?.map((item) => (
+                                                                <>
+                                                                    <a href={item} target='_blank' rel="noreferrer">{item}</a>
+                                                                    <br></br>
+                                                                </>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <br></br>
+                                                </>)
                                         })}
                                     </span>
                                 )}
@@ -1237,72 +1242,72 @@ const DetailProduct = () => {
                                 {isEditProduct ? (
                                     <Form.List name="decimals">
                                         {(fields, { add, remove }) => (
-                                        <>
-                                            {fields.map(({ key, name, ...restField }) => (
-                                                <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
-                                                    <Col span={23}>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Chain Name:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'chain']}
-                                                               
-                                                            >
-                                                            <Input placeholder="Enter chain name" />
-                                                        </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Contract Address:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'contract_address']}
-                                                            
-                                                            >
-                                                                <Input placeholder="Enter contract address"/>
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-item'>
-                                                            <div className='form-add-item-label'>Decimal:</div>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'decimal_place']}
-                                                            
-                                                            >
-                                                                <Input placeholder="Enter decimal"/>
-                                                            </Form.Item>
-                                                        </div>
-                                                    </Col>
-                                                    <Col span={1}>
-                                                        <MinusCircleOutlined onClick={() => remove(name)} />
-                                                    </Col>
-                                                </Row>
-                                            ))}
-                                            <Form.Item>
-                                                <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                    Add New Decimal
-                                                </Button>
-                                            </Form.Item>
-                                        </>
+                                            <>
+                                                {fields.map(({ key, name, ...restField }) => (
+                                                    <Row key={key} gutter={24} style={{ display: 'flex', alignItems: 'center' }}>
+                                                        <Col span={23}>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Chain Name:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'chain']}
+
+                                                                >
+                                                                    <Input placeholder="Enter chain name" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Contract Address:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'contract_address']}
+
+                                                                >
+                                                                    <Input placeholder="Enter contract address" />
+                                                                </Form.Item>
+                                                            </div>
+                                                            <div className='form-add-item'>
+                                                                <div className='form-add-item-label'>Decimal:</div>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'decimal_place']}
+
+                                                                >
+                                                                    <Input placeholder="Enter decimal" />
+                                                                </Form.Item>
+                                                            </div>
+                                                        </Col>
+                                                        <Col span={1}>
+                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                        </Col>
+                                                    </Row>
+                                                ))}
+                                                <Form.Item>
+                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                        Add New Decimal
+                                                    </Button>
+                                                </Form.Item>
+                                            </>
                                         )}
                                     </Form.List>
                                 ) : (<span className='form-add-item-content'>
-                                        {productInfo[0]?.detail?.decimals != null && Object.keys(productInfo[0]?.detail?.decimals)?.map((key) => {
-                                            return (<div style={{ marginBottom: '1rem' }}>
-                                                <div>Chain Name: <span style={{ marginLeft: '0.5rem' }}>{key}</span></div>
-                                                <div>Contract: 
-                                                    <span style={{ marginLeft: '0.5rem' }}>
-                                                        {productInfo[0]?.detail?.decimals[key]?.contract_address}
-                                                    </span>
-                                                </div>
-                                                <div>Decimals: 
-                                                    <span style={{ marginLeft: '0.5rem' }}>
-                                                        {productInfo[0]?.detail?.decimals[key]?.decimal_place}
-                                                    </span>
-                                                </div>
-                                                <br></br>
-                                            </div>)
-                                        })}
-                                    </span>
+                                    {productInfo[0]?.detail?.decimals != null && Object.keys(productInfo[0]?.detail?.decimals)?.map((key) => {
+                                        return (<div style={{ marginBottom: '1rem' }}>
+                                            <div>Chain Name: <span style={{ marginLeft: '0.5rem' }}>{key}</span></div>
+                                            <div>Contract:
+                                                <span style={{ marginLeft: '0.5rem' }}>
+                                                    {productInfo[0]?.detail?.decimals[key]?.contract_address}
+                                                </span>
+                                            </div>
+                                            <div>Decimals:
+                                                <span style={{ marginLeft: '0.5rem' }}>
+                                                    {productInfo[0]?.detail?.decimals[key]?.decimal_place}
+                                                </span>
+                                            </div>
+                                            <br></br>
+                                        </div>)
+                                    })}
+                                </span>
                                 )}
                             </Card>
 
@@ -1348,74 +1353,74 @@ const DetailProduct = () => {
                                         </div>
                                         <Form.List name="websites">
                                             {(fields, { add, remove }) => (
-                                            <>
-                                                {fields.map(({ key, name, ...restField }) => (
-                                                    <div className='form-add-item'>
-                                                        <div className='form-add-item-label'>
-                                                            <Form.Item
-                                                                {...restField}
-                                                                name={[name, 'key']}
-                                                                rules={[
-                                                                    {
-                                                                    required: true,
-                                                                    message: 'Missing key',
-                                                                    },
-                                                                ]}
-                                                            >
-                                                                <Input placeholder="Enter key" />
-                                                            </Form.Item>
-                                                        </div>
-                                                        <div className='form-add-new'>
-                                                            <div className='form-add-new-item'>
-                                                                <div className='form-add-item'>
-                                                                    <Form.Item
-                                                                        {...restField}
-                                                                        name={[name, 'value']}
-                                                                        rules={[
-                                                                            {
+                                                <>
+                                                    {fields.map(({ key, name, ...restField }) => (
+                                                        <div className='form-add-item'>
+                                                            <div className='form-add-item-label'>
+                                                                <Form.Item
+                                                                    {...restField}
+                                                                    name={[name, 'key']}
+                                                                    rules={[
+                                                                        {
                                                                             required: true,
-                                                                            message: 'Missing value',
-                                                                            },
-                                                                        ]}
-                                                                    >
-                                                                        <Select
-                                                                            placeholder="Enter Link url"
-                                                                            mode="tags"
-                                                                        />
-                                                                    </Form.Item>
-                                                                </div>
+                                                                            message: 'Missing key',
+                                                                        },
+                                                                    ]}
+                                                                >
+                                                                    <Input placeholder="Enter key" />
+                                                                </Form.Item>
                                                             </div>
-                                                            <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            <div className='form-add-new'>
+                                                                <div className='form-add-new-item'>
+                                                                    <div className='form-add-item'>
+                                                                        <Form.Item
+                                                                            {...restField}
+                                                                            name={[name, 'value']}
+                                                                            rules={[
+                                                                                {
+                                                                                    required: true,
+                                                                                    message: 'Missing value',
+                                                                                },
+                                                                            ]}
+                                                                        >
+                                                                            <Select
+                                                                                placeholder="Enter Link url"
+                                                                                mode="tags"
+                                                                            />
+                                                                        </Form.Item>
+                                                                    </div>
+                                                                </div>
+                                                                <MinusCircleOutlined onClick={() => remove(name)} />
+                                                            </div>
                                                         </div>
-                                                    </div>
-                                                ))}
-                                                <Form.Item>
-                                                    <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
-                                                        Add New Source Code
-                                                    </Button>
-                                                </Form.Item>
-                                            </>
+                                                    ))}
+                                                    <Form.Item>
+                                                        <Button type="dashed" style={{ width: 'fit-content' }} onClick={() => add()} block icon={<PlusOutlined />}>
+                                                            Add New Source Code
+                                                        </Button>
+                                                    </Form.Item>
+                                                </>
                                             )}
                                         </Form.List>
                                     </>
                                 ) : (<span>
-                                   {productInfo[0]?.detail?.website != null && Object.keys(productInfo[0]?.detail?.website).map((key) => {
-                                            return (
+                                    {productInfo[0]?.detail?.website != null && Object.keys(productInfo[0]?.detail?.website).map((key) => {
+                                        return (
                                             <>
-                                            <div style={{ display: 'flex' }}>
-                                                <span style={{ textTransform: 'capitalize' }}>{key}:</span>
-                                                <div style={{ marginLeft: '0.5rem' }}>
-                                                    {productInfo[0]?.detail?.website[key]?.map((item) => (
-                                                        <>
-                                                        <a href={item} target='_blank'  rel="noreferrer">{item}</a>
-                                                        <br></br>
-                                                        </>
-                                                    ))}
+                                                <div style={{ display: 'flex' }}>
+                                                    <span style={{ textTransform: 'capitalize' }}>{key}:</span>
+                                                    <div style={{ marginLeft: '0.5rem' }}>
+                                                        {productInfo[0]?.detail?.website[key]?.map((item) => (
+                                                            <>
+                                                                <a href={item} target='_blank' rel="noreferrer">{item}</a>
+                                                                <br></br>
+                                                            </>
+                                                        ))}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <br></br>
+                                                <br></br>
                                             </>)
-                                        })}
+                                    })}
                                 </span>)}
                             </Card>
                         </Space>
